@@ -10,7 +10,7 @@ on:
 
     paths: 
 
-      - "Site/**" 
+      - "site/**" 
 
       - ".github/workflows/deploy-site.yml" 
 
@@ -52,6 +52,6 @@ jobs:
 
               --destination '$web' \
 
-              --source "Site" \
+              --source site \
 
-              --overwrite
+              --overwrite true
