@@ -44,14 +44,4 @@ jobs:
 
           inlineScript: | 
 
-            az storage blob upload-batch \
-
-              --account-name "${{ secrets.AZURE_STORAGE_ACCOUNT }}" \
-
-              --sas-token "${{ secrets.AZURE_STORAGE_SAS_TOKEN }}" \
-
-              --destination '$web' \
-
-              --source site \
-
-              --overwrite true
+            az storage blob upload-batch --account-name "${{ secrets.AZURE_STORAGE_ACCOUNT }}" --sas-token "${{ secrets.AZURE_STORAGE_SAS_TOKEN }}" --destination '$web' --source site \ --overwrite true
