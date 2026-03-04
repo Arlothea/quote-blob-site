@@ -10,7 +10,7 @@ on:
 
     paths: 
 
-      - "site/**" 
+      - "Site/**" 
 
       - ".github/workflows/deploy-site.yml" 
 
@@ -44,14 +44,14 @@ jobs:
 
           inlineScript: | 
 
-            az storage blob upload-batch 
+            az storage blob upload-batch \
 
-              --account-name "${{ secrets.AZURE_STORAGE_ACCOUNT }}" 
+              --account-name "${{ secrets.AZURE_STORAGE_ACCOUNT }}" \
 
-              --sas-token "${{ secrets.AZURE_STORAGE_SAS_TOKEN }}"
+              --sas-token "${{ secrets.AZURE_STORAGE_SAS_TOKEN }}" \
 
-              --destination '$web'
+              --destination '$web' \
 
-              --source Site
+              --source "Site" \
 
-              --overwrite true
+              --overwrite
