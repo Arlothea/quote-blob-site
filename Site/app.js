@@ -1,4 +1,4 @@
-const FUNCTION_BASE_URL = "quotesapptutorial-cmh9h5dafyfnene9.francecentral-01.azurewebsites.net"; 
+const FUNCTION_BASE_URL = "https://quotesapptutorial-cmh9h5dafyfnene9.francecentral-01.azurewebsites.net"; 
 
   
 
