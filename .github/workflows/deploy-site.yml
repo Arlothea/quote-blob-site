@@ -10,7 +10,7 @@ on:
 
     paths:
 
-      - "site/**"
+      - "Site/**"
 
       - ".github/workflows/deploy-site.yml"
 
