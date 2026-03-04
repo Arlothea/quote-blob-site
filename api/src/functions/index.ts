@@ -1,1 +1,1 @@
-import "./functions/quote"; 
+import "./functions/quote";
