@@ -1,47 +1,52 @@
-name: Deploy site to Azure Blob Static Website 
+name: Deploy site to Azure Blob Static Website
 
   
 
-on: 
+on:
 
-  push: 
+  push:
 
-    branches: [ "main" ] 
+    branches: [ "main" ]
 
-    paths: 
+    paths:
 
-      - "site/**" 
+      - "site/**"
 
-      - ".github/workflows/deploy-site.yml" 
-
-  
-
-jobs: 
-
-  deploy: 
-
-    runs-on: ubuntu-latest 
-
-    steps: 
-
-      - uses: actions/checkout@v4 
-
-      - name: Debug account name 
-
-        run: | 
-
-          echo "Account: ${{ secrets.AZURE_STORAGE_ACCOUNT }}" 
+      - ".github/workflows/deploy-site.yml"
 
   
 
-      # Upload everything in /site to the $web container 
+jobs:
 
-      - name: Upload to $web 
+  deploy:
 
-        uses: azure/CLI@v2 
+    runs-on: ubuntu-latest
 
-        with: 
+    steps:
 
-          inlineScript: | 
+      - uses: actions/checkout@v4
 
-            az storage blob upload-batch --account-name "${{ secrets.AZURE_STORAGE_ACCOUNT }}" --sas-token "${{ secrets.AZURE_STORAGE_SAS_TOKEN }}" --destination '$web' --source site \ --overwrite true
+      - name: Debug account name
+
+        run: |
+
+          echo "Account: ${{ secrets.AZURE_STORAGE_ACCOUNT }}"
+
+  
+
+      # Upload everything in /site to the $web container
+
+      - name: Upload to $web
+
+        uses: azure/CLI@v2
+
+        with:
+
+          inlineScript: |
+
+            az storage blob upload-batch \
+              --account-name "${{ secrets.AZURE_STORAGE_ACCOUNT }}" \
+              --sas-token "${{ secrets.AZURE_STORAGE_SAS_TOKEN }}" \
+              --destination '$web' \
+              --source site \
+              --overwrite true
