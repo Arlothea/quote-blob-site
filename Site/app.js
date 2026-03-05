@@ -1,6 +1,16 @@
-const FUNCTION_BASE_URL = "https://quotesapptutorial-cmh9h5dafyfnene9.francecentral-01.azurewebsites.net"; 
+const FUNCTION_BASE_URL = 
 
-let selectedFile = null; 
+  "https://quotesapptutorial-cmh9h5dafyfnene9.francecentral-01.azurewebsites.net"; 
+
+ 
+
+/* ========================================================= 
+
+   PART 1: Quotes App (existing feature) 
+
+   ========================================================= */ 
+
+ 
 
 const btn = document.getElementById("btn"); 
 
@@ -8,23 +18,7 @@ const quoteEl = document.getElementById("quote");
 
 const statusEl = document.getElementById("status"); 
 
-const fileInput = document.getElementById("fileInput"); 
-
-const btnFormat = document.getElementById("btnFormat"); 
-
-const btnCopy = document.getElementById("btnCopy"); 
-
-const outputEl = document.getElementById("output"); 
-
-const nameOk = selectedFile.name.toLowerCase().endsWith(".txt"); 
-
-const typeOk = (selectedFile.type || "").startsWith("text/"); 
-
-const isText = nameOk || typeOk; 
-
-const maxBytes = 200 * 1024; // 200KB for a demo 
-
-
+ 
 
 btn.addEventListener("click", async () => { 
 
@@ -32,7 +26,7 @@ btn.addEventListener("click", async () => {
 
   btn.disabled = true; 
 
-  
+ 
 
   try { 
 
@@ -40,7 +34,7 @@ btn.addEventListener("click", async () => {
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`); 
 
-  
+ 
 
     const data = await res.json(); 
 
@@ -60,138 +54,192 @@ btn.addEventListener("click", async () => {
 
   } 
 
-  // PART 2
-
-fileInput.addEventListener("change", () => { 
-
-  selectedFile = fileInput.files?.[0] ?? null; 
-
-  outputEl.value = ""; 
-
-  btnCopy.disabled = true; 
-
- 
-
-  if (!selectedFile) { 
-
-    btnFormat.disabled = true; 
-
-    statusEl.textContent = ""; 
-
-    return; 
-
-  } 
-
- 
-
-  // Basic validation 
-
-
-  if (!isText) { 
-
-    btnFormat.disabled = true; 
-
-    statusEl.textContent = "Please select a plain text (.txt) file."; 
-
-    selectedFile = null; 
-
-    return; 
-
-  } 
-
- 
-
-  if (selectedFile.size > maxBytes) { 
-
-    btnFormat.disabled = true; 
-
-    statusEl.textContent = "File is too large for this demo (max 200KB)."; 
-
-    selectedFile = null; 
-
-    return; 
-
-  } 
-
- 
-
-  btnFormat.disabled = false; 
-
-  statusEl.textContent = `Selected: ${selectedFile.name} (${selectedFile.size} bytes)`; 
-
 }); 
 
  
 
-btnFormat.addEventListener("click", async () => { 
+/* ========================================================= 
 
-  if (!selectedFile) return; 
+   PART 2: Sentence Case Formatter (new feature) 
 
- 
+   Requires these elements in index.html: 
 
-  btnFormat.disabled = true; 
+   - fileInput (input type="file") 
 
-  statusEl.textContent = "Sending text to the API..."; 
+   - btnFormat (button) 
 
- 
+   - btnCopy (button) 
 
-  try { 
+   - formatStatus (p or span) 
 
-    const text = await selectedFile.text(); 
+   - output (textarea) 
 
- 
-
-    const res = await fetch("/api/sentencecase", { 
-
-      method: "POST", 
-
-      headers: { "Content-Type": "application/json" }, 
-
-      body: JSON.stringify({ text }) 
-
-    }); 
+   ========================================================= */ 
 
  
 
-    if (!res.ok) { 
+const fileInput = document.getElementById("fileInput"); 
 
-      const errText = await res.text(); 
+const btnFormat = document.getElementById("btnFormat"); 
 
-      throw new Error(`API error (${res.status}): ${errText}`); 
+const btnCopy = document.getElementById("btnCopy"); 
+
+const formatStatusEl = document.getElementById("formatStatus"); 
+
+const outputEl = document.getElementById("output"); 
+
+ 
+
+let selectedFile = null; 
+
+ 
+
+// If the formatter UI isn't on the page yet, quietly do nothing. 
+
+// This allows you to merge the JS before you add the HTML. 
+
+if (fileInput && btnFormat && btnCopy && formatStatusEl && outputEl) { 
+
+  fileInput.addEventListener("change", () => { 
+
+    selectedFile = fileInput.files?.[0] ?? null; 
+
+    outputEl.value = ""; 
+
+    btnCopy.disabled = true; 
+
+ 
+
+    if (!selectedFile) { 
+
+      btnFormat.disabled = true; 
+
+      formatStatusEl.textContent = ""; 
+
+      return; 
 
     } 
 
  
 
-    const data = await res.json(); 
+    // Basic validation 
 
-    outputEl.value = data.result ?? ""; 
+    const const nameOk = selectedFile.name.toLowerCase().endsWith(".txt"); 
 
-    btnCopy.disabled = outputEl.value.length === 0; 
+    const typeOk = (selectedFile.type || "").startsWith("text/"); 
+
+    const isText = nameOk || typeOk; 
+
+    const maxBytes = 200 * 1024; // 200KB for a demo 
 
  
 
-    statusEl.textContent = "Done."; 
+    if (!isText) { 
 
-  } catch (err) { 
+      btnFormat.disabled = true; 
 
-    statusEl.textContent = `Failed: ${err.message}`; 
+      formatStatusEl.textContent = "Please select a plain text (.txt) file."; 
 
-  } finally { 
+      selectedFile = null; 
 
-    btnFormat.disabled = !selectedFile; 
+      return; 
 
-  } 
+    } 
 
-}); 
+ 
 
-btnCopy.addEventListener("click", async () => { 
+    if (selectedFile.size > maxBytes) { 
 
-  await navigator.clipboard.writeText(outputEl.value); 
+      btnFormat.disabled = true; 
 
-  statusEl.textContent = "Copied output to clipboard."; 
+      formatStatusEl.textContent = "File is too large for this demo (max 200KB)."; 
 
-}); 
-// END PART 2
+      selectedFile = null; 
 
-}); 
+      return; 
+
+    } 
+
+ 
+
+    btnFormat.disabled = false; 
+
+    formatStatusEl.textContent = `Selected: ${selectedFile.name} (${selectedFile.size} bytes)`; 
+
+  }); 
+
+ 
+
+  btnFormat.addEventListener("click", async () => { 
+
+    if (!selectedFile) return; 
+
+ 
+
+    btnFormat.disabled = true; 
+
+    formatStatusEl.textContent = "Sending text to the API..."; 
+
+ 
+
+    try { 
+
+      const text = await selectedFile.text(); 
+
+ 
+
+      const res = await fetch(`${FUNCTION_BASE_URL}/api/sentencecase`, { 
+
+        method: "POST", 
+
+        headers: { "Content-Type": "application/json" }, 
+
+        body: JSON.stringify({ text }) 
+
+      }); 
+
+ 
+
+      if (!res.ok) { 
+
+        const errText = await res.text(); 
+
+        throw new Error(`API error (${res.status}): ${errText}`); 
+
+      } 
+
+ 
+
+      const data = await res.json(); 
+
+      outputEl.value = data.result ?? ""; 
+
+      btnCopy.disabled = outputEl.value.length === 0; 
+
+ 
+
+      formatStatusEl.textContent = "Done."; 
+
+    } catch (err) { 
+
+      formatStatusEl.textContent = `Failed: ${err.message}`; 
+
+    } finally { 
+
+      btnFormat.disabled = !selectedFile; 
+
+    } 
+
+  }); 
+
+ 
+
+  btnCopy.addEventListener("click", async () => { 
+
+    await navigator.clipboard.writeText(outputEl.value); 
+
+    formatStatusEl.textContent = "Copied output to clipboard."; 
+
+  }); 
+
+} 
