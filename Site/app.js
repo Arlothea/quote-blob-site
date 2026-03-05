@@ -83,7 +83,7 @@ fileInput.addEventListener("change", () => {
 
   // Basic validation 
 
-  const const nameOk = selectedFile.name.toLowerCase().endsWith(".txt"); 
+  const nameOk = selectedFile.name.toLowerCase().endsWith(".txt"); 
 
   const typeOk = (selectedFile.type || "").startsWith("text/"); 
 
