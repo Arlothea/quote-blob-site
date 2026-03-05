@@ -8,6 +8,23 @@ const quoteEl = document.getElementById("quote");
 
 const statusEl = document.getElementById("status"); 
 
+const fileInput = document.getElementById("fileInput"); 
+
+const btnFormat = document.getElementById("btnFormat"); 
+
+const btnCopy = document.getElementById("btnCopy"); 
+
+const outputEl = document.getElementById("output"); 
+
+const nameOk = selectedFile.name.toLowerCase().endsWith(".txt"); 
+
+const typeOk = (selectedFile.type || "").startsWith("text/"); 
+
+const isText = nameOk || typeOk; 
+
+const maxBytes = 200 * 1024; // 200KB for a demo 
+
+let selectedFile = null; 
 
 btn.addEventListener("click", async () => { 
 
@@ -45,20 +62,6 @@ btn.addEventListener("click", async () => {
 
   // PART 2
 
-const fileInput = document.getElementById("fileInput"); 
-
-const btnFormat = document.getElementById("btnFormat"); 
-
-const btnCopy = document.getElementById("btnCopy"); 
-
-const statusEl = document.getElementById("status"); 
-
-const outputEl = document.getElementById("output"); 
-
-let selectedFile = null; 
-
- 
-
 fileInput.addEventListener("change", () => { 
 
   selectedFile = fileInput.files?.[0] ?? null; 
@@ -83,13 +86,7 @@ fileInput.addEventListener("change", () => {
 
   // Basic validation 
 
-  const nameOk = selectedFile.name.toLowerCase().endsWith(".txt"); 
 
-  const typeOk = (selectedFile.type || "").startsWith("text/"); 
-
-  const isText = nameOk || typeOk; 
-
-  const maxBytes = 200 * 1024; // 200KB for a demo 
 
  
 
