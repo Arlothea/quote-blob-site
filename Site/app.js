@@ -1,6 +1,6 @@
 const FUNCTION_BASE_URL = "https://quotesapptutorial-cmh9h5dafyfnene9.francecentral-01.azurewebsites.net"; 
 
-  
+let selectedFile = null; 
 
 const btn = document.getElementById("btn"); 
 
@@ -24,7 +24,7 @@ const isText = nameOk || typeOk;
 
 const maxBytes = 200 * 1024; // 200KB for a demo 
 
-let selectedFile = null; 
+
 
 btn.addEventListener("click", async () => { 
 
@@ -86,9 +86,6 @@ fileInput.addEventListener("change", () => {
 
   // Basic validation 
 
-
-
- 
 
   if (!isText) { 
 
