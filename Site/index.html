@@ -34,37 +34,34 @@
 
   <div class="muted" id="status"></div> 
 
-<section class="card"> 
+<section class="card">
+  
+  <h2>Text Formatter (Filename Router)</h2>
 
-  <h2>Sentence Case Formatter</h2> 
+  <p class="muted">
+    Name your file like <strong>notes_uppercase.txt</strong> or
+    <strong>notes_sentencecase.txt</strong>.
+  </p>
+  
+  <label for="fileInput">Upload a .txt file</label><br />
 
- 
+  <input id="fileInput" type="file" accept=".txt,text/plain" />
 
-  <label for="fileInput">Upload a .txt file</label><br /> 
+  <div style="margin-top: 12px;">
 
-  <input id="fileInput" type="file" accept=".txt,text/plain" /> 
+    <button id="btnFormat" disabled>Format</button>
 
- 
+    <button id="btnCopy" disabled>Copy Output</button>
 
-  <div style="margin-top: 12px;"> 
+  </div>
 
-    <button id="btnFormat" disabled>Convert to Sentence Case</button> 
+  <p id="formatStatus" style="margin-top: 12px;"></p>
 
-    <button id="btnCopy" disabled>Copy Output</button> 
+  <h3>Output</h3>
 
-  </div> 
+  <textarea id="output" rows="10" style="width: 100%;" readonly></textarea>
 
- 
-
-  <p id="formatStatus" style="margin-top: 12px;"></p> 
-
- 
-
-  <h3>Output</h3> 
-
-  <textarea id="output" rows="10" style="width: 100%;" readonly></textarea> 
-
-</section> 
+</section>
 
   <script src="app.js?v=4" defer></script> 
 
