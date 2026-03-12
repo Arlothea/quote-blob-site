@@ -2,6 +2,7 @@ import { app, HttpRequest, HttpResponseInit, InvocationContext } from
     "@azure/functions";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { FORMATTERS, FormatterAction } from "../formatters";
+
 type Body = {
     filename?: string;
     text?: string;
@@ -96,8 +97,8 @@ export async function format(
             await containerClient.createIfNotExists();
             const safeInputName = sanitiseFilename(filename);
             const safeOutputName = sanitiseFilename(outputFilename);
-            const originalBlobName = `originals/${safeInputName}`;
-            const formattedBlobName = `converted/${safeOutputName}`;
+            const originalBlobName = `originals/${safeInputName}-${Date.now()}`;
+            const formattedBlobName = `converted/${safeOutputName}-${Date.now()}`;
             await uploadTextBlob(containerClient, originalBlobName, text);
             await uploadTextBlob(containerClient, formattedBlobName, result);
             return {
