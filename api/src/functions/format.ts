@@ -98,7 +98,7 @@ export async function format(
             const safeInputName = sanitiseFilename(filename);
             const safeOutputName = sanitiseFilename(outputFilename);
             const originalBlobName = `originals/${safeInputName}-${Date.now()}`;
-            const formattedBlobName = `converted/${safeOutputName}-${Date.now()}`;
+            const formattedBlobName = `converted/${safeOutputName}-${new Date().toISOString().slice(0, 10)}`;
             await uploadTextBlob(containerClient, originalBlobName, text);
             await uploadTextBlob(containerClient, formattedBlobName, result);
             return {
