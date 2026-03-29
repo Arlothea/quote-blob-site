@@ -1,70 +1,169 @@
-<!doctype html> 
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>File Converter</title>
 
-<html lang="en"> 
+  <style>
+    body {
+      font-family: system-ui, Arial, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 16px;
+      background: #fafafa;
+    }
 
-<head> 
+    h1, h2, h3 {
+      margin-top: 0;
+    }
 
-  <meta charset="utf-8" /> 
+    button {
+      padding: 10px 14px;
+      font-size: 16px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: white;
+    }
 
-  <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
 
-  <title>File Converter</title> 
+    input, select, textarea {
+      font: inherit;
+    }
 
-  <style> 
+    input[type="file"],
+    select,
+    textarea {
+      width: 100%;
+      max-width: 100%;
+      margin-top: 6px;
+    }
 
-    body { font-family: system-ui, Arial, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; } 
+    select,
+    textarea {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      background: white;
+    }
 
-    button { padding: 10px 14px; font-size: 16px; cursor: pointer; } 
+    textarea {
+      resize: vertical;
+    }
 
-    #quote { margin-top: 18px; padding: 14px; border: 1px solid #ddd; border-radius: 8px; min-height: 28px; } 
+    .card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 24px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    }
 
-    .muted { color: #666; font-size: 14px; margin-top: 10px; } 
+    .muted {
+      color: #666;
+      font-size: 14px;
+      margin-top: 10px;
+    }
 
-  </style> 
+    .button-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
 
-</head> 
+    .status {
+      margin-top: 12px;
+      min-height: 22px;
+    }
 
-<body> 
+    #quote {
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      min-height: 28px;
+      background: white;
+    }
 
-  <h1>Quote Button</h1> 
+    label {
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
 
-  <button id="btn">Get a quote</button> 
+  <h1>Cloud File Conversion App</h1>
 
-  <div id="quote">Click the button to fetch a quote.</div> 
+  <section class="card">
+    <h2>Quote Button</h2>
+    <button id="btn">Get a quote</button>
+    <div id="quote">Click the button to fetch a quote.</div>
+    <div class="muted" id="status"></div>
+  </section>
 
-  <div class="muted" id="status"></div> 
+  <section class="card">
+    <h2>Text Formatter</h2>
 
-<section class="card">
-  
-  <h2>Text Formatter (Filename Router)</h2>
+    <p class="muted">
+      Name your file like <strong>notes_uppercase.txt</strong> or
+      <strong>notes_sentencecase.txt</strong>.
+    </p>
 
-  <p class="muted">
-    Name your file like <strong>notes_uppercase.txt</strong> or
-    <strong>notes_sentencecase.txt</strong>.
-  </p>
-  
-  <label for="fileInput">Upload a .txt file</label><br />
+    <label for="fileInput">Upload a .txt file</label>
+    <input id="fileInput" type="file" accept=".txt,text/plain" />
 
-  <input id="fileInput" type="file" accept=".txt,text/plain" />
+    <div class="button-row">
+      <button id="btnFormat" disabled>Format</button>
+      <button id="btnDownload" disabled>Download Formatted File</button>
+    </div>
 
-  <div style="margin-top: 12px;">
+    <p id="formatStatus" class="status"></p>
 
-    <button id="btnFormat" disabled>Format</button>
+    <h3>Formatted Output</h3>
+    <textarea id="output" rows="10" readonly></textarea>
+  </section>
 
-    <button id="btnDownload" disabled>Download Formatted File</button>
+  <section class="card">
+    <h2>File Converter</h2>
 
-  </div>
+    <p class="muted">
+      Supported routes:
+      <strong>TXT list to JSON</strong>,
+      <strong>CSV to JSON</strong>,
+      <strong>JSON to CSV</strong>,
+      <strong>Markdown to HTML</strong>.
+    </p>
 
-  <p id="formatStatus" style="margin-top: 12px;"></p>
+    <label for="convertFileInput">Upload a supported file</label>
+    <input id="convertFileInput" type="file" accept=".txt,.csv,.json,.md,text/plain,text/csv,application/json,text/markdown" />
 
-  <h3>Output</h3>
+    <label for="targetFormat" style="display:block; margin-top: 14px;">Choose target format</label>
+    <select id="targetFormat">
+      <option value="">Select output format</option>
+      <option value="json">JSON</option>
+      <option value="csv">CSV</option>
+      <option value="html">HTML</option>
+    </select>
 
-  <textarea id="output" rows="10" style="width: 100%;" readonly></textarea>
+    <div class="button-row">
+      <button id="btnConvert" disabled>Convert File</button>
+      <button id="btnConvertDownload" disabled>Download Converted File</button>
+    </div>
 
-</section>
+    <p id="convertStatus" class="status"></p>
 
-  <script src="app.js?v=4" defer></script> 
+    <h3>Converted Output</h3>
+    <textarea id="convertOutput" rows="12" readonly></textarea>
+  </section>
 
-</body> 
-
-</html> 
+  <script src="app.js?v=5" defer></script>
+</body>
+</html>
