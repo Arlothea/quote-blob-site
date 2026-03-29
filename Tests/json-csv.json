@@ -1,4 +1,4 @@
 [
-  { "name": "Adam", "grade": 80% },
-  { "name": "Jamie", "grade": 75% }
+  { "name": "Adam", "score": 10 },
+  { "name": "Jamie", "score": 12 }
 ]
