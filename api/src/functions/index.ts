@@ -1,3 +1,3 @@
-import "./functions/quote";
-import "./functions/format";
-import "./functions/convert";
+import "./quote";
+import "./format";
+import "./convert";
