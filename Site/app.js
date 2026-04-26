@@ -104,12 +104,25 @@ if (fileInput && btnFormat && btnDownload && formatStatusEl && outputEl) {
 
       const data = await res.json();
 
-      outputEl.value = data.result ?? "";
-      downloadedFilename = data.outputFilename ?? "formatted.txt";
-      btnDownload.disabled = outputEl.value.length === 0;
+      convertedDownloadFilename = data.outputFilename ?? "converted.txt";
 
-      formatStatusEl.textContent =
-        `Done. Route used: ${data.action}. Stored as ${data.originalBlobName} and ${data.formattedBlobName}. You can now download the formatted file.`;
+      if (data.isBinary) {
+        convertOutputEl.value =
+          "Excel file converted successfully. Click download to save the Excel file.";
+
+        convertedDownloadFilename = data.outputFilename ?? "converted.xlsx";
+        btnConvertDownload.disabled = !data.downloadUrl;
+        btnConvertDownload.dataset.downloadUrl = data.downloadUrl;
+
+        convertStatusEl.textContent =
+          `Done. Route used: ${data.action}. Stored as ${data.originalBlobName} and ${data.convertedBlobName}. You can now download the Excel file.`;
+      } else {
+        convertOutputEl.value = data.result ?? "";
+        btnConvertDownload.disabled = convertOutputEl.value.length === 0;
+
+        convertStatusEl.textContent =
+          `Done. Route used: ${data.action}. Stored as ${data.originalBlobName} and ${data.convertedBlobName}. You can now download the converted file.`;
+      }
     } catch (err) {
       outputEl.value = "";
       btnDownload.disabled = true;
@@ -168,6 +181,7 @@ function isValidConversion(file, targetFormat) {
   if (ext === ".csv" && targetFormat === "json") return true;
   if (ext === ".json" && targetFormat === "csv") return true;
   if (ext === ".md" && targetFormat === "html") return true;
+  if (ext === ".csv" && targetFormat === "xlsx") return true;
 
   return false;
 }
@@ -193,6 +207,7 @@ if (
     selectedConvertFile = convertFileInput.files?.[0] ?? null;
     convertOutputEl.value = "";
     btnConvertDownload.disabled = true;
+    delete btnConvertDownload.dataset.downloadUrl;
 
     if (!selectedConvertFile) {
       convertStatusEl.textContent = "";
@@ -233,6 +248,7 @@ if (
   targetFormatEl.addEventListener("change", () => {
     convertOutputEl.value = "";
     btnConvertDownload.disabled = true;
+    delete btnConvertDownload.dataset.downloadUrl;
 
     if (!selectedConvertFile) {
       convertStatusEl.textContent = "Please choose a file first.";
@@ -248,7 +264,7 @@ if (
 
     if (!isValidConversion(selectedConvertFile, targetFormatEl.value)) {
       convertStatusEl.textContent =
-        "That conversion route is not supported. Supported routes are TXT→JSON, CSV→JSON, JSON→CSV, and MD→HTML.";
+        "That conversion route is not supported. Supported routes are TXT→JSON, CSV→JSON, JSON→CSV, CSV→EXCEL and MD→HTML.";
       btnConvert.disabled = true;
       return;
     }
@@ -264,6 +280,7 @@ if (
 
     btnConvert.disabled = true;
     btnConvertDownload.disabled = true;
+    delete btnConvertDownload.dataset.downloadUrl;
     convertStatusEl.textContent = "Sending file to the conversion API...";
 
     try {
@@ -295,6 +312,7 @@ if (
     } catch (err) {
       convertOutputEl.value = "";
       btnConvertDownload.disabled = true;
+      delete btnConvertDownload.dataset.downloadUrl;
       convertStatusEl.textContent = `Failed: ${err.message}`;
     } finally {
       updateConvertButtonState();
@@ -302,6 +320,18 @@ if (
   });
 
   btnConvertDownload.addEventListener("click", () => {
+    const downloadUrl = btnConvertDownload.dataset.downloadUrl;
+
+    if (downloadUrl) {
+      const a = document.createElement("a");
+      a.href = downloadUrl;
+      a.download = convertedDownloadFilename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      return;
+    }
+
     let contentType = "text/plain;charset=utf-8";
 
     if (convertedDownloadFilename.toLowerCase().endsWith(".json")) {

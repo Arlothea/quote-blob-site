@@ -182,6 +182,9 @@ export async function convert(
       getContentType(getExtension(outputFilename))
     );
 
+    const convertedBlobClient =
+      containerClient.getBlockBlobClient(convertedBlobName);
+
     return {
       status: 200,
       jsonBody: {
@@ -190,7 +193,8 @@ export async function convert(
         result: Buffer.isBuffer(result) ? null : result,
         isBinary: Buffer.isBuffer(result),
         originalBlobName,
-        convertedBlobName
+        convertedBlobName,
+        downloadUrl: convertedBlobClient.url
       }
     };
   } catch (err) {
