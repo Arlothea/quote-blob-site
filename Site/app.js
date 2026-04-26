@@ -2,7 +2,7 @@ const FUNCTION_BASE_URL =
   "https://quotesapptutorial-cmh9h5dafyfnene9.francecentral-01.azurewebsites.net";
 
 /* =========================================================
-   PART 1: Quotes App (existing feature)
+   PART 1: Quotes App
    ========================================================= */
 
 const btn = document.getElementById("btn");
@@ -31,7 +31,7 @@ if (btn && quoteEl && statusEl) {
 }
 
 /* =========================================================
-   PART 2: Existing text formatter with file download
+   PART 2: Text Formatter with file download
    ========================================================= */
 
 const fileInput = document.getElementById("fileInput");
@@ -104,27 +104,12 @@ if (fileInput && btnFormat && btnDownload && formatStatusEl && outputEl) {
 
       const data = await res.json();
 
-      convertedDownloadFilename = data.outputFilename ?? "converted.txt";
+      outputEl.value = data.result ?? "";
+      downloadedFilename = data.outputFilename ?? "formatted.txt";
+      btnDownload.disabled = outputEl.value.length === 0;
 
-      if (data.isBinary) {
-        console.log("Binary response:", data);
-        
-        convertOutputEl.value =
-          "Excel file converted successfully. Click download to save the Excel file.";
-
-        convertedDownloadFilename = data.outputFilename ?? "converted.xlsx";
-        btnConvertDownload.disabled = !data.binaryBase64;
-        btnConvertDownload.dataset.binaryBase64 = data.binaryBase64 || "";
-
-        convertStatusEl.textContent =
-          `Done. Route used: ${data.action}. Stored as ${data.originalBlobName} and ${data.convertedBlobName}. You can now download the Excel file.`;
-      } else {
-        convertOutputEl.value = data.result ?? "";
-        btnConvertDownload.disabled = convertOutputEl.value.length === 0;
-
-        convertStatusEl.textContent =
-          `Done. Route used: ${data.action}. Stored as ${data.originalBlobName} and ${data.convertedBlobName}. You can now download the converted file.`;
-      }
+      formatStatusEl.textContent =
+        `Done. Route used: ${data.action}. Stored as ${data.originalBlobName} and ${data.formattedBlobName}. You can now download the formatted file.`;
     } catch (err) {
       outputEl.value = "";
       btnDownload.disabled = true;
@@ -140,18 +125,20 @@ if (fileInput && btnFormat && btnDownload && formatStatusEl && outputEl) {
     });
 
     const url = URL.createObjectURL(blob);
+
     const a = document.createElement("a");
     a.href = url;
     a.download = downloadedFilename;
     document.body.appendChild(a);
     a.click();
     a.remove();
+
     URL.revokeObjectURL(url);
   });
 }
 
 /* =========================================================
-   PART 3: New file converter with separate upload/download
+   PART 3: File Converter with separate upload/download
    ========================================================= */
 
 const convertFileInput = document.getElementById("convertFileInput");
@@ -181,9 +168,9 @@ function isValidConversion(file, targetFormat) {
 
   if (ext === ".txt" && targetFormat === "json") return true;
   if (ext === ".csv" && targetFormat === "json") return true;
+  if (ext === ".csv" && targetFormat === "xlsx") return true;
   if (ext === ".json" && targetFormat === "csv") return true;
   if (ext === ".md" && targetFormat === "html") return true;
-  if (ext === ".csv" && targetFormat === "xlsx") return true;
 
   return false;
 }
@@ -194,7 +181,10 @@ function updateConvertButtonState() {
     return;
   }
 
-  btnConvert.disabled = !isValidConversion(selectedConvertFile, targetFormatEl.value);
+  btnConvert.disabled = !isValidConversion(
+    selectedConvertFile,
+    targetFormatEl.value
+  );
 }
 
 if (
@@ -266,13 +256,14 @@ if (
 
     if (!isValidConversion(selectedConvertFile, targetFormatEl.value)) {
       convertStatusEl.textContent =
-        "That conversion route is not supported. Supported routes are TXT→JSON, CSV→JSON, JSON→CSV, CSV→EXCEL and MD→HTML.";
+        "That conversion route is not supported. Supported routes are TXT→JSON, CSV→JSON, CSV→EXCEL, JSON→CSV, and MD→HTML.";
       btnConvert.disabled = true;
       return;
     }
 
     convertStatusEl.textContent =
       `Ready to convert ${selectedConvertFile.name} to ${targetFormatEl.value.toUpperCase()}.`;
+
     updateConvertButtonState();
   });
 
@@ -305,12 +296,28 @@ if (
 
       const data = await res.json();
 
-      convertOutputEl.value = data.result ?? "";
-      convertedDownloadFilename = data.outputFilename ?? "converted.txt";
-      btnConvertDownload.disabled = convertOutputEl.value.length === 0;
+      console.log("Convert API response:", data);
 
-      convertStatusEl.textContent =
-        `Done. Route used: ${data.action}. Stored as ${data.originalBlobName} and ${data.convertedBlobName}. You can now download the converted file.`;
+      convertedDownloadFilename = data.outputFilename ?? "converted.txt";
+
+      if (data.isBinary) {
+        convertOutputEl.value =
+          "Excel file converted successfully. Click download to save the Excel file.";
+
+        convertedDownloadFilename = data.outputFilename ?? "converted.xlsx";
+        btnConvertDownload.disabled = !data.binaryBase64;
+        btnConvertDownload.dataset.binaryBase64 = data.binaryBase64 || "";
+
+        convertStatusEl.textContent =
+          `Done. Route used: ${data.action}. Stored as ${data.originalBlobName} and ${data.convertedBlobName}. You can now download the Excel file.`;
+      } else {
+        convertOutputEl.value = data.result ?? "";
+        btnConvertDownload.disabled = convertOutputEl.value.length === 0;
+        delete btnConvertDownload.dataset.binaryBase64;
+
+        convertStatusEl.textContent =
+          `Done. Route used: ${data.action}. Stored as ${data.originalBlobName} and ${data.convertedBlobName}. You can now download the converted file.`;
+      }
     } catch (err) {
       convertOutputEl.value = "";
       btnConvertDownload.disabled = true;
