@@ -111,8 +111,8 @@ if (fileInput && btnFormat && btnDownload && formatStatusEl && outputEl) {
           "Excel file converted successfully. Click download to save the Excel file.";
 
         convertedDownloadFilename = data.outputFilename ?? "converted.xlsx";
-        btnConvertDownload.disabled = !data.downloadUrl;
-        btnConvertDownload.dataset.downloadUrl = data.downloadUrl;
+        btnConvertDownload.disabled = !data.binaryBase64;
+        btnConvertDownload.dataset.binaryBase64 = data.binaryBase64 || "";
 
         convertStatusEl.textContent =
           `Done. Route used: ${data.action}. Stored as ${data.originalBlobName} and ${data.convertedBlobName}. You can now download the Excel file.`;
@@ -207,7 +207,7 @@ if (
     selectedConvertFile = convertFileInput.files?.[0] ?? null;
     convertOutputEl.value = "";
     btnConvertDownload.disabled = true;
-    delete btnConvertDownload.dataset.downloadUrl;
+    delete btnConvertDownload.dataset.binaryBase64;
 
     if (!selectedConvertFile) {
       convertStatusEl.textContent = "";
@@ -248,7 +248,7 @@ if (
   targetFormatEl.addEventListener("change", () => {
     convertOutputEl.value = "";
     btnConvertDownload.disabled = true;
-    delete btnConvertDownload.dataset.downloadUrl;
+    delete btnConvertDownload.dataset.binaryBase64;
 
     if (!selectedConvertFile) {
       convertStatusEl.textContent = "Please choose a file first.";
@@ -280,7 +280,7 @@ if (
 
     btnConvert.disabled = true;
     btnConvertDownload.disabled = true;
-    delete btnConvertDownload.dataset.downloadUrl;
+    delete btnConvertDownload.dataset.binaryBase64;
     convertStatusEl.textContent = "Sending file to the conversion API...";
 
     try {
@@ -312,7 +312,7 @@ if (
     } catch (err) {
       convertOutputEl.value = "";
       btnConvertDownload.disabled = true;
-      delete btnConvertDownload.dataset.downloadUrl;
+      delete btnConvertDownload.dataset.binaryBase64;
       convertStatusEl.textContent = `Failed: ${err.message}`;
     } finally {
       updateConvertButtonState();
@@ -320,15 +320,30 @@ if (
   });
 
   btnConvertDownload.addEventListener("click", () => {
-    const downloadUrl = btnConvertDownload.dataset.downloadUrl;
+    const binaryBase64 = btnConvertDownload.dataset.binaryBase64;
 
-    if (downloadUrl) {
+    if (binaryBase64) {
+      const binaryString = atob(binaryBase64);
+      const bytes = new Uint8Array(binaryString.length);
+
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      const blob = new Blob([bytes], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      });
+
+      const url = URL.createObjectURL(blob);
+
       const a = document.createElement("a");
-      a.href = downloadUrl;
+      a.href = url;
       a.download = convertedDownloadFilename;
       document.body.appendChild(a);
       a.click();
       a.remove();
+
+      URL.revokeObjectURL(url);
       return;
     }
 

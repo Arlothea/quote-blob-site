@@ -182,19 +182,16 @@ export async function convert(
       getContentType(getExtension(outputFilename))
     );
 
-    const convertedBlobClient =
-      containerClient.getBlockBlobClient(convertedBlobName);
-
     return {
       status: 200,
       jsonBody: {
         action,
         outputFilename,
         result: Buffer.isBuffer(result) ? null : result,
+        binaryBase64: Buffer.isBuffer(result) ? result.toString("base64") : null,
         isBinary: Buffer.isBuffer(result),
         originalBlobName,
-        convertedBlobName,
-        downloadUrl: convertedBlobClient.url
+        convertedBlobName
       }
     };
   } catch (err) {
