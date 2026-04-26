@@ -22,6 +22,7 @@ function detectConversion(filename: string, targetFormat: string): ConverterActi
   if (ext === ".csv" && target === "json") return "csv-to-json";
   if (ext === ".json" && target === "csv") return "json-to-csv";
   if (ext === ".md" && target === "html") return "md-to-html";
+  if (ext === ".csv" && target === "xlsx") return "csv-to-excel";
 
   return null;
 }
@@ -43,28 +44,30 @@ function getContentType(extension: string): string {
       return "text/csv; charset=utf-8";
     case ".html":
       return "text/html; charset=utf-8";
+    case ".xlsx":
+      return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     default:
       return "text/plain; charset=utf-8";
   }
 }
 
-async function uploadTextBlob(
+async function uploadBlob(
   containerClient: ReturnType<BlobServiceClient["getContainerClient"]>,
   blobName: string,
-  text: string,
+  content: string | Buffer,
   contentType: string
 ): Promise<void> {
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-  await blockBlobClient.upload(
-    Buffer.from(text, "utf8"),
-    Buffer.byteLength(text, "utf8"),
-    {
-      blobHTTPHeaders: {
-        blobContentType: contentType
-      }
+  const buffer = Buffer.isBuffer(content)
+    ? content
+    : Buffer.from(content, "utf8");
+
+  await blockBlobClient.uploadData(buffer, {
+    blobHTTPHeaders: {
+      blobContentType: contentType
     }
-  );
+  });
 }
 
 export async function convert(
@@ -112,7 +115,7 @@ export async function convert(
       return {
         status: 400,
         jsonBody: {
-          error: "Unsupported conversion route. Supported routes are TXT→JSON, CSV→JSON, JSON→CSV, and MD→HTML."
+          error: "Unsupported conversion route. Supported routes are TXT→JSON, CSV→JSON, CSV→EXCEL, JSON→CSV, and MD→HTML."
         }
       };
     }
@@ -126,10 +129,10 @@ export async function convert(
       };
     }
 
-    let result: string;
+    let result: string | Buffer;
 
     try {
-      result = converter(text);
+      result = await converter(text);
     } catch (err) {
       return {
         status: 400,
@@ -165,14 +168,14 @@ export async function convert(
     const originalBlobName = `originals/${safeInputName}-${Date.now()}`;
     const convertedBlobName = `converted/${safeOutputName}-${Date.now()}`;
 
-    await uploadTextBlob(
+    await uploadBlob(
       containerClient,
       originalBlobName,
       text,
       getContentType(getExtension(filename))
     );
 
-    await uploadTextBlob(
+    await uploadBlob(
       containerClient,
       convertedBlobName,
       result,
@@ -184,7 +187,8 @@ export async function convert(
       jsonBody: {
         action,
         outputFilename,
-        result,
+        result: Buffer.isBuffer(result) ? null : result,
+        isBinary: Buffer.isBuffer(result),
         originalBlobName,
         convertedBlobName
       }

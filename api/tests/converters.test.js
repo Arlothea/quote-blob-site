@@ -5,6 +5,7 @@ const { txtToJson } = require("../dist/converters/txtToJson");
 const { csvToJson } = require("../dist/converters/csvToJson");
 const { jsonToCsv } = require("../dist/converters/jsonToCsv");
 const { markdownToHtml } = require("../dist/converters/markdownToHtml");
+const { csvToExcel } = require("../dist/converters/csvToExcel");
 
 test("txtToJson converts newline-separated text into a JSON array", () => {
   const input = "apple\nbanana\norange";
@@ -80,4 +81,13 @@ test("markdownToHtml converts headings and paragraphs", () => {
     result,
     "<h1>Title</h1>\n<p>This is a paragraph.</p>\n<h2>Subtitle</h2>\n<p>Another line.</p>"
   );
+});
+
+test("csvToExcel converts CSV into an Excel buffer", async () => {
+  const input = "name,age\nAlice,21\nBob,22";
+
+  const result = await csvToExcel(input);
+
+  assert.ok(Buffer.isBuffer(result));
+  assert.ok(result.length > 0);
 });

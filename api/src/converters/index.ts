@@ -2,18 +2,21 @@ import { txtToJson } from "./txtToJson";
 import { csvToJson } from "./csvToJson";
 import { jsonToCsv } from "./jsonToCsv";
 import { markdownToHtml } from "./markdownToHtml";
+import { csvToExcel } from "./csvToExcel";
 
 export type ConverterAction =
   | "txt-to-json"
   | "csv-to-json"
   | "json-to-csv"
-  | "md-to-html";
+  | "md-to-html"
+  | "csv-to-excel";
 
-export type ConverterFn = (input: string) => string;
+export type ConverterFn = (input: string) => string | Promise<Buffer>;
 
 export const CONVERTERS: Record<ConverterAction, ConverterFn> = {
   "txt-to-json": txtToJson,
   "csv-to-json": csvToJson,
   "json-to-csv": jsonToCsv,
-  "md-to-html": markdownToHtml
+  "md-to-html": markdownToHtml,
+  "csv-to-excel": csvToExcel
 };
