@@ -107,6 +107,8 @@ if (fileInput && btnFormat && btnDownload && formatStatusEl && outputEl) {
       convertedDownloadFilename = data.outputFilename ?? "converted.txt";
 
       if (data.isBinary) {
+        console.log("Binary response:", data);
+        
         convertOutputEl.value =
           "Excel file converted successfully. Click download to save the Excel file.";
 
